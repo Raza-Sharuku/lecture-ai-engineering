@@ -71,12 +71,26 @@ class DataValidator:
             }
             data_source = context.add_datasource(**datasource_config)
             # data_source = context._datasources.add_pandas(name="pandas_source")
-            data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
+            # data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
 
-            batch_definition = data_asset.add_batch_definition_whole_dataframe(
-                "batch definition"
+            # batch_definition = data_asset.add_batch_definition_whole_dataframe(
+            #     "batch definition"
+            # )
+            # batch = batch_definition.get_batch(batch_parameters={"dataframe": data})
+            try:
+                suite = context.create_expectation_suite(
+                    "test_suite", overwrite_existing=True
+                )
+            except:
+                suite = context.get_expectation_suite("test_suite")
+
+            # batch_kwargs を使用する
+            batch_kwargs = {"datasource": "pandas_datasource", "dataset": data}
+
+            # バッチ取得
+            batch = context.get_batch(
+                batch_kwargs=batch_kwargs, expectation_suite_name="test_suite"
             )
-            batch = batch_definition.get_batch(batch_parameters={"dataframe": data})
 
             results = []
 
