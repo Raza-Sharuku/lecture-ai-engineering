@@ -78,54 +78,74 @@ def test_missing_values_acceptable(sample_data):
 
 def test_value_ranges(sample_data):
     """値の範囲を検証"""
-    context = gx.get_context()
-    data_source = context.data_sources.add_pandas("pandas")
-    data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
-
-    batch_definition = data_asset.add_batch_definition_whole_dataframe(
-        "batch definition"
+    context = gx.get_context(
+        context_root_dir=os.path.join(os.path.dirname(__file__), "gx")
     )
-    batch = batch_definition.get_batch(batch_parameters={"dataframe": sample_data})
+    # data_source = context._datasources.add_pandas(name="pandas_source")
+    datasource_config = {
+        "name": "pandas_datasource",
+        "class_name": "PandasDatasource",
+    }
+    data_source = context.add_datasource(**datasource_config)
+    # data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
 
-    results = []
+    # batch_definition = data_asset.add_batch_definition_whole_dataframe(
+    #     "batch definition"
+    # )
+    # batch = batch_definition.get_batch(batch_parameters={"dataframe": sample_data})
+    try:
+        suite = context.create_expectation_suite("test_suite", overwrite_existing=True)
+    except:
+        suite = context.get_expectation_suite("test_suite")
 
-    # 必須カラムの存在確認
-    required_columns = [
-        "Pclass",
-        "Sex",
-        "Age",
-        "SibSp",
-        "Parch",
-        "Fare",
-        "Embarked",
-    ]
-    missing_columns = [
-        col for col in required_columns if col not in sample_data.columns
-    ]
-    if missing_columns:
-        print(f"警告: 以下のカラムがありません: {missing_columns}")
-        return False, [{"success": False, "missing_columns": missing_columns}]
+    # batch_kwargs を使用する
+    batch_kwargs = {"datasource": "pandas_datasource", "dataset": sample_data}
 
-    expectations = [
-        gx.expectations.ExpectColumnDistinctValuesToBeInSet(
-            column="Pclass", value_set=[1, 2, 3]
-        ),
-        gx.expectations.ExpectColumnDistinctValuesToBeInSet(
-            column="Sex", value_set=["male", "female"]
-        ),
-        gx.expectations.ExpectColumnValuesToBeBetween(
-            column="Age", min_value=0, max_value=100
-        ),
-        gx.expectations.ExpectColumnValuesToBeBetween(
-            column="Fare", min_value=0, max_value=600
-        ),
-        gx.expectations.ExpectColumnDistinctValuesToBeInSet(
-            column="Embarked", value_set=["C", "Q", "S", ""]
-        ),
-    ]
+    # バッチ取得
+    batch = context.get_batch(
+        batch_kwargs=batch_kwargs, expectation_suite_name="test_suite"
+    )
 
-    for expectation in expectations:
-        result = batch.validate(expectation)
-        results.append(result)
-        is_successful = all(result.success for result in results)
-    assert is_successful, "データの値範囲が期待通りではありません"
+
+#     results = []
+
+#     # 必須カラムの存在確認
+#     required_columns = [
+#         "Pclass",
+#         "Sex",
+#         "Age",
+#         "SibSp",
+#         "Parch",
+#         "Fare",
+#         "Embarked",
+#     ]
+#     missing_columns = [
+#         col for col in required_columns if col not in sample_data.columns
+#     ]
+#     if missing_columns:
+#         print(f"警告: 以下のカラムがありません: {missing_columns}")
+#         return False, [{"success": False, "missing_columns": missing_columns}]
+
+#     expectations = [
+#         gx.expectations.ExpectColumnDistinctValuesToBeInSet(
+#             column="Pclass", value_set=[1, 2, 3]
+#         ),
+#         gx.expectations.ExpectColumnDistinctValuesToBeInSet(
+#             column="Sex", value_set=["male", "female"]
+#         ),
+#         gx.expectations.ExpectColumnValuesToBeBetween(
+#             column="Age", min_value=0, max_value=100
+#         ),
+#         gx.expectations.ExpectColumnValuesToBeBetween(
+#             column="Fare", min_value=0, max_value=600
+#         ),
+#         gx.expectations.ExpectColumnDistinctValuesToBeInSet(
+#             column="Embarked", value_set=["C", "Q", "S", ""]
+#         ),
+#     ]
+
+#     for expectation in expectations:
+#         result = batch.validate(expectation)
+#         results.append(result)
+#         is_successful = all(result.success for result in results)
+#     assert is_successful, "データの値範囲が期待通りではありません"

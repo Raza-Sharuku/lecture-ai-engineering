@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 import time
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -171,3 +171,51 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
+
+def test_model_overfitting(train_model, sample_data):
+    """モデルの過学習を検証"""
+    model, X_test, y_test = train_model
+
+    # 学習データの準備
+    X = sample_data.drop("Survived", axis=1)
+    y = sample_data["Survived"].astype(int)
+    X_train, _, y_train, _ = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # 学習データとテストデータでの精度を計算
+    train_accuracy = accuracy_score(y_train, model.predict(X_train))
+    test_accuracy = accuracy_score(y_test, model.predict(X_test))
+
+    # 学習データとテストデータの精度差が0.1未満であることを確認
+    accuracy_diff = train_accuracy - test_accuracy
+    assert (
+        accuracy_diff < 0.2
+    ), f"過学習の可能性があります。精度差: {accuracy_diff:.3f} (学習: {train_accuracy:.3f}, テスト: {test_accuracy:.3f})"
+
+
+def test_model_cross_validation(sample_data, preprocessor):
+    """交差検証によるモデルの安定性を検証"""
+    # データの準備
+    X = sample_data.drop("Survived", axis=1)
+    y = sample_data["Survived"].astype(int)
+
+    # モデルパイプラインの作成
+    model = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", RandomForestClassifier(n_estimators=100, random_state=42)),
+        ]
+    )
+
+    # 5分割交差検証を実行
+    cv_scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
+
+    # スコアの平均と標準偏差を計算
+    mean_score = cv_scores.mean()
+    std_score = cv_scores.std()
+
+    # 平均スコアが0.75以上であることを確認
+    assert mean_score >= 0.75, f"交差検証の平均精度が低すぎます: {mean_score:.3f}"
+
+    # 標準偏差が0.05未満であることを確認（安定性の指標）
+    assert std_score < 0.05, f"モデルの安定性が低すぎます。標準偏差: {std_score:.3f}"

@@ -4,4 +4,4 @@ mlflow
 pandas
 pytest
 great_expectations==0.15.50
-black
+black 
