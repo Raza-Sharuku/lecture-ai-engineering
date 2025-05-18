@@ -79,7 +79,7 @@ def test_missing_values_acceptable(sample_data):
 def test_value_ranges(sample_data):
     """値の範囲を検証"""
     context = gx.get_context(
-        context_root_dir=os.path.join(os.path.dirname(__file__), "../gx")
+        context_root_dir=os.path.join(os.path.dirname(__file__), "gx")
     )
     # data_source = context._datasources.add_pandas(name="pandas_source")
     datasource_config = {
