@@ -81,7 +81,12 @@ def test_value_ranges(sample_data):
     context = gx.get_context(
         context_root_dir=os.path.join(os.path.dirname(__file__), "../gx")
     )
-    data_source = context._datasources.add_pandas(name="pandas_source")
+    # data_source = context._datasources.add_pandas(name="pandas_source")
+    datasource_config = {
+                "name": "pandas_datasource",
+                "class_name": "PandasDatasource",
+            }
+    data_source = context.add_datasource(**datasource_config)
     data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
 
     batch_definition = data_asset.add_batch_definition_whole_dataframe(
