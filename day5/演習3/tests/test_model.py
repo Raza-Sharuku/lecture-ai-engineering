@@ -173,7 +173,7 @@ def test_model_reproducibility(sample_data, preprocessor):
     ), "モデルの予測結果に再現性がありません"
 
 
-def test_model_overfitting(train_model):
+def test_model_overfitting(train_model, sample_data):
     """モデルの過学習を検証"""
     model, X_test, y_test = train_model
 
