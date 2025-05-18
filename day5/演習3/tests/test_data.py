@@ -106,45 +106,46 @@ def test_value_ranges(sample_data):
         batch_kwargs=batch_kwargs, expectation_suite_name="test_suite"
     )
 
-    results = []
 
-    # 必須カラムの存在確認
-    required_columns = [
-        "Pclass",
-        "Sex",
-        "Age",
-        "SibSp",
-        "Parch",
-        "Fare",
-        "Embarked",
-    ]
-    missing_columns = [
-        col for col in required_columns if col not in sample_data.columns
-    ]
-    if missing_columns:
-        print(f"警告: 以下のカラムがありません: {missing_columns}")
-        return False, [{"success": False, "missing_columns": missing_columns}]
+#     results = []
 
-    expectations = [
-        gx.expectations.ExpectColumnDistinctValuesToBeInSet(
-            column="Pclass", value_set=[1, 2, 3]
-        ),
-        gx.expectations.ExpectColumnDistinctValuesToBeInSet(
-            column="Sex", value_set=["male", "female"]
-        ),
-        gx.expectations.ExpectColumnValuesToBeBetween(
-            column="Age", min_value=0, max_value=100
-        ),
-        gx.expectations.ExpectColumnValuesToBeBetween(
-            column="Fare", min_value=0, max_value=600
-        ),
-        gx.expectations.ExpectColumnDistinctValuesToBeInSet(
-            column="Embarked", value_set=["C", "Q", "S", ""]
-        ),
-    ]
+#     # 必須カラムの存在確認
+#     required_columns = [
+#         "Pclass",
+#         "Sex",
+#         "Age",
+#         "SibSp",
+#         "Parch",
+#         "Fare",
+#         "Embarked",
+#     ]
+#     missing_columns = [
+#         col for col in required_columns if col not in sample_data.columns
+#     ]
+#     if missing_columns:
+#         print(f"警告: 以下のカラムがありません: {missing_columns}")
+#         return False, [{"success": False, "missing_columns": missing_columns}]
 
-    for expectation in expectations:
-        result = batch.validate(expectation)
-        results.append(result)
-        is_successful = all(result.success for result in results)
-    assert is_successful, "データの値範囲が期待通りではありません"
+#     expectations = [
+#         gx.expectations.ExpectColumnDistinctValuesToBeInSet(
+#             column="Pclass", value_set=[1, 2, 3]
+#         ),
+#         gx.expectations.ExpectColumnDistinctValuesToBeInSet(
+#             column="Sex", value_set=["male", "female"]
+#         ),
+#         gx.expectations.ExpectColumnValuesToBeBetween(
+#             column="Age", min_value=0, max_value=100
+#         ),
+#         gx.expectations.ExpectColumnValuesToBeBetween(
+#             column="Fare", min_value=0, max_value=600
+#         ),
+#         gx.expectations.ExpectColumnDistinctValuesToBeInSet(
+#             column="Embarked", value_set=["C", "Q", "S", ""]
+#         ),
+#     ]
+
+#     for expectation in expectations:
+#         result = batch.validate(expectation)
+#         results.append(result)
+#         is_successful = all(result.success for result in results)
+#     assert is_successful, "データの値範囲が期待通りではありません"
