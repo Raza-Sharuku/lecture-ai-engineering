@@ -11,6 +11,7 @@ import pickle
 import time
 import great_expectations as gx
 
+
 class DataLoader:
     """データロードを行うクラス"""
 
@@ -61,7 +62,9 @@ class DataValidator:
 
         # Great Expectationsを使用したバリデーション
         try:
-            context = gx.get_context(context_root_dir=os.path.join(os.path.dirname(__file__), "gx"))
+            context = gx.get_context(
+                context_root_dir=os.path.join(os.path.dirname(__file__), "gx")
+            )
             data_source = context.data_sources.add_pandas("pandas")
             data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
 
