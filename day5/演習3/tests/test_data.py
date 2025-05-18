@@ -83,9 +83,9 @@ def test_value_ranges(sample_data):
     )
     # data_source = context._datasources.add_pandas(name="pandas_source")
     datasource_config = {
-                "name": "pandas_datasource",
-                "class_name": "PandasDatasource",
-            }
+        "name": "pandas_datasource",
+        "class_name": "PandasDatasource",
+    }
     data_source = context.add_datasource(**datasource_config)
     data_asset = data_source.add_dataframe_asset(name="pd dataframe asset")
 
